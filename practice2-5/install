@@ -1,0 +1,15 @@
+#!/bin/bash
+# This script will apply practice2-5 sql-script to db
+
+DOCKER_ID=$(docker ps -f "name=postgresql-edu" | tail -n 1 | awk '{print $1}')
+if [ -z "$DOCKER_ID" ]; then
+    echo "No docker container found"
+    exit 1
+fi
+
+files=("schema.sql" "functions.sql" "roles.sql" "policies.sql" "defaults.sql")
+
+for i in ${files[*]}; do
+    docker cp $i $DOCKER_ID:/shared/
+    docker exec -i $DOCKER_ID /bin/bash -c "psql -q -U postgres -f /shared/${i}"
+done

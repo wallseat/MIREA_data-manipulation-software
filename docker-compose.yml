@@ -10,3 +10,12 @@ services:
       - ./shared/:/shared:rw
     ports:
       - 5432:5432
+  
+  pgadmin:
+    image: dpage/pgadmin4:6.13
+    container_name: pgadmin-edu
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=wallseat@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=1234
+    ports:
+      - 8000:80

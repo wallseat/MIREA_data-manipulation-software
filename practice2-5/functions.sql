@@ -60,11 +60,11 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
     RETURN QUERY SELECT 
-        count(*) as task_count,
-        sum(case when completed and close_date <= due_date then 1 else 0 end) as completed_task_count,
-        sum(case when completed and close_date > due_date then 1 else 0 end) as completed_out_of_date_task_count,
-        sum(case when not completed and due_date >= current_date then 1 else 0 end) as not_completed_task_count,
-        sum(case when not completed and due_date < current_date then 1 else 0 end) as not_completed_out_of_date_task_count
+        count(*) :: int as task_count,
+        sum(case when completed and close_date <= due_date then 1 else 0 end) :: int as completed_task_count,
+        sum(case when completed and close_date > due_date then 1 else 0 end) :: int as completed_out_of_date_task_count,
+        sum(case when not completed and due_date >= current_date then 1 else 0 end) :: int as not_completed_task_count,
+        sum(case when not completed and due_date < current_date then 1 else 0 end) :: int as not_completed_out_of_date_task_count
     FROM "shop"."tasks"
     WHERE executor = "user" and open_date between date_start and date_end;
 END;

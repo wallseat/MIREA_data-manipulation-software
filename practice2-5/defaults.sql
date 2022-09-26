@@ -40,7 +40,7 @@ $body$
         RETURNING id INTO organization_id;
 
         INSERT INTO
-            "shop"."contact_persons" ("first_name", "last_name", "email", "tel", "organization_id")
+            "shop"."contact_persons" ("first_name", "second_name", "email", "tel", "organization_id")
         VALUES 
             ('Иван', 'Иванов', 'ivanov.ivan@org.id', '+79995551122', organization_id);
 

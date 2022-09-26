@@ -17,14 +17,14 @@ CREATE INDEX "ix_organizations_location" ON "shop"."organizations" ("location");
 CREATE TABLE "shop"."contact_persons"(
     "id" SERIAL PRIMARY KEY,
     "first_name" VARCHAR(100) NOT NULL,
-    "last_name" VARCHAR(100) NOT NULL,
+    "second_name" VARCHAR(100) NOT NULL,
     "email" VARCHAR(100) NOT NULL,
     "tel" VARCHAR(15),
     "organization_id" INT REFERENCES "shop"."organizations"("id") NOT NULL,
-    UNIQUE("first_name", "last_name", "email")
+    UNIQUE("first_name", "second_name", "email")
 );
 
-CREATE INDEX "ix_contact_persons_first_name_last_name" ON "shop"."contact_persons" ("first_name", "last_name");
+CREATE INDEX "ix_contact_persons_first_name_second_name" ON "shop"."contact_persons" ("first_name", "second_name");
 
 CREATE TABLE "shop"."equipment_positions" (
     "id" SERIAL PRIMARY KEY,
@@ -72,7 +72,7 @@ CREATE TABLE "shop"."tasks" (
     "id" SERIAL PRIMARY KEY,
     "title" VARCHAR(100) NOT NULL,
     "description" TEXT,
-    "priority_id" INT2 REFERENCES "shop"."priority" ("id") DEFAULT 0,
+    "priority_id" INT2 REFERENCES "shop"."priority" ("id") NOT NULL DEFAULT 0,
     "type_id" INT2 REFERENCES "shop"."task_type" ("id") NOT NULL,
     "open_date" DATE NOT NULL DEFAULT current_date,
     "close_date" DATE,

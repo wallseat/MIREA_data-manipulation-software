@@ -48,8 +48,11 @@ CREATE TRIGGER expire_complited_tasks
 AFTER INSERT OR UPDATE ON "shop"."tasks"
     FOR EACH ROW EXECUTE PROCEDURE "shop"."process_expire_complited_tasks"();
 
-CREATE OR REPLACE FUNCTION "shop"."create_report"("user" VARCHAR(100), date_start DATE, date_end DATE)
+CREATE OR REPLACE FUNCTION "shop"."create_report"(user_ VARCHAR(100), date_start_ DATE, date_end_ DATE)
 RETURNS TABLE(
+    "user" VARCHAR(100),
+    "date_start" DATE,
+    "date_end" DATE,
     "task_count" INT,
     "completed_task_count" INT,
     "completed_out_of_date_task_count" INT,
@@ -59,13 +62,16 @@ RETURNS TABLE(
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    RETURN QUERY SELECT 
+    RETURN QUERY SELECT
+        user_ as user,
+        date_start_ as date_start,
+        date_end_ as date_end,
         count(*) :: int as task_count,
         sum(case when completed and close_date <= due_date then 1 else 0 end) :: int as completed_task_count,
         sum(case when completed and close_date > due_date then 1 else 0 end) :: int as completed_out_of_date_task_count,
         sum(case when not completed and due_date >= current_date then 1 else 0 end) :: int as not_completed_task_count,
         sum(case when not completed and due_date < current_date then 1 else 0 end) :: int as not_completed_out_of_date_task_count
     FROM "shop"."tasks"
-    WHERE executor = "user" and open_date between date_start and date_end;
+    WHERE executor = user_ and open_date between date_start_ and date_end_;
 END;
 $$;

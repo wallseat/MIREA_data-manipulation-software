@@ -9,12 +9,14 @@ from app.core.const import ALGORITHM, SECRET_KEY
 from app.core.security import oauth2_scheme
 from app.core.http_exceptions import (
     credentials_exception,
-    user_not_found_exception,
+    x_not_found_exception_factory,
     permission_denied_exception,
 )
 from app.crud.user import crud_user
 from app.db import engine
 from app.models import User, UserGroup, Group
+
+user_not_found_exception = x_not_found_exception_factory("User")
 
 
 async def get_session() -> AsyncGenerator:

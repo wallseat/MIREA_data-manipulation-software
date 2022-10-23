@@ -13,13 +13,18 @@ from app.schemas.contact_person import (
 from app.crud.contact_person import crud_contact_person
 from app.crud.organization import crud_organization
 from app.core.http_exceptions import (
-    organization_not_found_exception,
-    contact_person_already_exists_exception,
-    contact_person_not_found_exception,
+    x_already_exists_exception_factory,
+    x_not_found_exception_factory,
 )
 
 router = APIRouter()
 admin_only = RoleChecker(["admin"])
+
+organization_not_found_exception = x_not_found_exception_factory("Organization")
+contact_person_already_exists_exception = x_already_exists_exception_factory(
+    "Contact person"
+)
+contact_person_not_found_exception = x_not_found_exception_factory("Contact person")
 
 
 @router.get("/{organization}", response_model=List[ContactPersonOut])

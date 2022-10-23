@@ -1,18 +1,23 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import parse_obj_as
 
 from app.api.providers import get_session, RoleChecker
 from app.schemas.group import GroupOut, GroupAddUsers
 from app.schemas.user import UserOut
 from app.crud.user import crud_user
 from app.crud.group import crud_group
-from app.core.http_exceptions import group_not_found_exception, user_not_found_exception
+from app.core.http_exceptions import (
+    x_not_found_exception_factory,
+    x_already_exists_exception_factory,
+)
 
 router = APIRouter()
 
 admin_only = RoleChecker(["admin"])
+
+group_already_exists_exception = x_already_exists_exception_factory("Group")
+group_not_found_exception = x_not_found_exception_factory("Group")
 
 
 @router.get("/", response_model=List[GroupOut], dependencies=[Depends(admin_only)])

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 
 from app.api.providers import get_current_user
 
-from .endpoints import user, group, organization, contact_person
+from .endpoints import user, group, organization, contact_person, equipment
 
 
 v1_router = APIRouter()
@@ -30,6 +30,12 @@ v1_router.include_router(
     contact_person.router,
     prefix="/contact_person",
     tags=["contact_person"],
+    dependencies=[Depends(get_current_user)],
+)
+v1_router.include_router(
+    equipment.router,
+    prefix="/equipment",
+    tags=["equipment"],
     dependencies=[Depends(get_current_user)],
 )
 

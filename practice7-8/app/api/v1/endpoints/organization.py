@@ -1,12 +1,9 @@
 from typing import List
-from app.models import Organization
 
 from fastapi import APIRouter, Depends
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
-from app.api.providers import get_session, RoleChecker, get_current_user
+from app.api.providers import get_session, RoleChecker
 from app.schemas.organization import (
     OrganizationOut,
     OrganizationCreate,
@@ -14,12 +11,17 @@ from app.schemas.organization import (
 )
 from app.crud.organization import crud_organization
 from app.core.http_exceptions import (
-    organization_already_exists_exception,
-    organization_not_found_exception,
+    x_already_exists_exception_factory,
+    x_not_found_exception_factory,
 )
 
 router = APIRouter()
 admin_only = RoleChecker(["admin"])
+
+organization_already_exists_exception = x_already_exists_exception_factory(
+    "Organization"
+)
+organization_not_found_exception = x_not_found_exception_factory("Organization")
 
 
 @router.get("/", response_model=List[OrganizationOut])

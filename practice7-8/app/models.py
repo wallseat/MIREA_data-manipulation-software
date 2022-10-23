@@ -116,7 +116,11 @@ class ContactPerson(
     tel = Column(String(15), nullable=True)
     organization_id = Column(
         UUID(as_uuid=True),
-        ForeignKey(f"{SCHEMA}.organization.id", deferrable=True, initially="DEFERRED"),
+        ForeignKey(
+            f"{SCHEMA}.organization.id",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
         nullable=False,
     )
 
@@ -125,7 +129,7 @@ class EquipmentPosition(Base):
     __tablename__ = "equipment_positions"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    name = Column(String(100), nullable=False)
+    name = Column(String(100), nullable=False, unique=True)
     description = Column(TEXT, nullable=True)
     price = Column(Numeric(10, 2, asdecimal=False), nullable=False)
 
@@ -137,11 +141,13 @@ class EquipmentBalance(Base):
     position_id = Column(
         UUID(as_uuid=True),
         ForeignKey(
-            f"{SCHEMA}.equipment_positions.id", deferrable=True, initially="DEFERRED"
+            f"{SCHEMA}.equipment_positions.id",
+            deferrable=True,
+            initially="DEFERRED",
         ),
         nullable=False,
     )
-    serial_number = Column(String(100), nullable=False)
+    serial_number = Column(String(100), nullable=False, unique=True)
 
 
 class Contract(Base):
@@ -152,12 +158,20 @@ class Contract(Base):
     description = Column(TEXT, nullable=True)
     type_id = Column(
         UUID(as_uuid=True),
-        ForeignKey(f"{SCHEMA}.contract_type.id", deferrable=True, initially="DEFERRED"),
+        ForeignKey(
+            f"{SCHEMA}.contract_type.id",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
         nullable=False,
     )
     organization_id = Column(
         UUID(as_uuid=True),
-        ForeignKey(f"{SCHEMA}.organization.id", deferrable=True, initially="DEFERRED"),
+        ForeignKey(
+            f"{SCHEMA}.organization.id",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
         nullable=False,
     )
 
@@ -176,13 +190,19 @@ class ContractEquipment(
 
     contract_id = Column(
         UUID(as_uuid=True),
-        ForeignKey(f"{SCHEMA}.contract.id", deferrable=True, initially="DEFERRED"),
+        ForeignKey(
+            f"{SCHEMA}.contract.id",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
         nullable=False,
     )
     equipment_id = Column(
         UUID(as_uuid=True),
         ForeignKey(
-            f"{SCHEMA}.equipment_balance.id", deferrable=True, initially="DEFERRED"
+            f"{SCHEMA}.equipment_balance.id",
+            deferrable=True,
+            initially="DEFERRED",
         ),
         nullable=False,
     )
@@ -196,12 +216,20 @@ class Task(Base):
     description = Column(TEXT, nullable=True)
     priority_id = Column(
         UUID(as_uuid=True),
-        ForeignKey(f"{SCHEMA}.priority.id", deferrable=True, initially="DEFERRED"),
+        ForeignKey(
+            f"{SCHEMA}.priority.id",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
         nullable=False,
     )
     type_id = Column(
         UUID(as_uuid=True),
-        ForeignKey(f"{SCHEMA}.task_type.id", deferrable=True, initially="DEFERRED"),
+        ForeignKey(
+            f"{SCHEMA}.task_type.id",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
         nullable=False,
     )
     open_date = Column(Date, nullable=False, default=date.today)
@@ -210,23 +238,37 @@ class Task(Base):
     completed = Column(Boolean, default=False, nullable=False)
     author = Column(
         UUID(as_uuid=True),
-        ForeignKey(f"{SCHEMA}.user.id", deferrable=True, initially="DEFERRED"),
+        ForeignKey(
+            f"{SCHEMA}.user.id",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
         nullable=False,
     )
     executor = Column(
         UUID(as_uuid=True),
-        ForeignKey(f"{SCHEMA}.user.id", deferrable=True, initially="DEFERRED"),
+        ForeignKey(
+            f"{SCHEMA}.user.id",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
         nullable=False,
     )
     contract_id = Column(
         UUID(as_uuid=True),
-        ForeignKey(f"{SCHEMA}.contract.id", deferrable=True, initially="DEFERRED"),
+        ForeignKey(
+            f"{SCHEMA}.contract.id",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
         nullable=True,
     )
     contact_person_id = Column(
         UUID(as_uuid=True),
         ForeignKey(
-            f"{SCHEMA}.contact_person.id", deferrable=True, initially="DEFERRED"
+            f"{SCHEMA}.contact_person.id",
+            deferrable=True,
+            initially="DEFERRED",
         ),
         nullable=False,
     )

@@ -1,15 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.providers import get_session, RoleChecker, get_current_user
 from app.schemas.user import UserOut, UserCreate, UserUpdatePassword, UserUpdateName
 from app.models import User
 from app.crud.user import crud_user
-from app.core.security import get_password_hash, verify_password
+from app.core.security import verify_password
 from app.core.http_exceptions import (
     permission_denied_exception,
-    user_not_found_exception,
-    user_already_exists_exception,
+    x_already_exists_exception_factory,
+    x_not_found_exception_factory,
     credentials_exception,
 )
 
@@ -17,6 +17,9 @@ router = APIRouter()
 
 admin_only = RoleChecker(["admin"])
 is_admin = RoleChecker(["admin"], raise_not_allowed=False)
+
+user_not_found_exception = x_not_found_exception_factory("User")
+user_already_exists_exception = x_already_exists_exception_factory("User")
 
 
 @router.post(
@@ -52,7 +55,7 @@ async def get_user_by_name(
     user_obj = await crud_user.get_by_name(session, name=username)
     if not user_obj:
         raise user_not_found_exception
-    
+
     return user_obj
 
 

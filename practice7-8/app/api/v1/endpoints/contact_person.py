@@ -1,30 +1,23 @@
 from typing import List
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-
-
-from app.api.providers import get_session, RoleChecker
+from app.api.providers import RoleChecker, get_session
+from app.core.http_exceptions import x_already_exists_exception, x_not_found_exception
+from app.crud.contact_person import crud_contact_person
+from app.crud.organization import crud_organization
 from app.schemas.contact_person import (
     ContactPersonCreate,
     ContactPersonOut,
     ContactPersonUpdate,
 )
-from app.crud.contact_person import crud_contact_person
-from app.crud.organization import crud_organization
-from app.core.http_exceptions import (
-    x_already_exists_exception_factory,
-    x_not_found_exception_factory,
-)
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 admin_only = RoleChecker(["admin"])
 
-organization_not_found_exception = x_not_found_exception_factory("Organization")
-contact_person_already_exists_exception = x_already_exists_exception_factory(
-    "Contact person"
-)
-contact_person_not_found_exception = x_not_found_exception_factory("Contact person")
+organization_not_found_exception = x_not_found_exception("Organization")
+contact_person_already_exists_exception = x_already_exists_exception("Contact person")
+contact_person_not_found_exception = x_not_found_exception("Contact person")
 
 
 @router.get("/{organization}", response_model=List[ContactPersonOut])

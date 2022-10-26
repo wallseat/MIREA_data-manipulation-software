@@ -14,13 +14,13 @@ permission_denied_exception = HTTPException(
     headers=DEFAULT_HEADERS,
 )
 
-x_not_found_exception_factory = lambda x: HTTPException(
+x_not_found_exception = lambda x: HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail=f"{x} not found",
     headers=DEFAULT_HEADERS,
 )
 
-x_already_exists_exception_factory = lambda x: HTTPException(
+x_already_exists_exception = lambda x: HTTPException(
     status_code=status.HTTP_403_FORBIDDEN,
     detail=f"{x} already exists",
     headers=DEFAULT_HEADERS,

@@ -1,4 +1,5 @@
 from typing import Optional, List
+from datetime import date
 
 from sqlalchemy import select, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,7 +40,6 @@ class CRUDOrganization:
         *,
         organization_in: OrganizationCreate,
     ) -> Organization:
-
         organization = Organization(**organization_in.dict())
         session.add(organization)
         await session.commit()
@@ -54,7 +54,6 @@ class CRUDOrganization:
         organization: Organization,
         organization_in: OrganizationUpdate,
     ) -> Organization:
-
         organization_data = jsonable_encoder(organization)
         update_data = organization_in.dict(skip_defaults=True)
 
@@ -76,6 +75,18 @@ class CRUDOrganization:
     ) -> None:
         session.delete(organization)
         await session.commit()
+
+    async def set_first_contact_date(
+        self,
+        session: AsyncSession,
+        *,
+        organization: Organization,
+        first_contact_date: date,
+    ) -> Organization:
+        organization.first_contact_date = first_contact_date
+        session.add(organization)
+        await session.commit()
+        await session.refresh(organization)
 
 
 crud_organization = CRUDOrganization()

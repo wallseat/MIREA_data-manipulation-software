@@ -1,12 +1,10 @@
-from typing import Optional, List
+from typing import List, Optional
 
-from sqlalchemy import select, delete, and_
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.dialects.postgresql import insert
-from fastapi.encoders import jsonable_encoder
-
-from app.models import Organization, ContactPerson
+from app.models import ContactPerson, Organization
 from app.schemas.contact_person import ContactPersonCreate, ContactPersonUpdate
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy import and_, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CRUDContactPerson:
@@ -55,11 +53,9 @@ class CRUDContactPerson:
         organization: Organization,
     ) -> ContactPerson:
 
-        contact_person_dict = contact_person_in.dict()
-        contact_person_dict.pop("organization_name")
-
         organization = ContactPerson(
-            **contact_person_dict, organization_id=organization.id
+            **contact_person_in.dict(exclude=["organization_name"]),
+            organization_id=organization.id,
         )
         session.add(organization)
 

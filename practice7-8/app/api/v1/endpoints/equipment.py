@@ -1,37 +1,25 @@
 from typing import List
 
+from app.api.providers import RoleChecker, get_session
+from app.core.http_exceptions import x_already_exists_exception, x_not_found_exception
+from app.crud.equipment import crud_equipment
+from app.schemas.equipment import (
+    EquipmentCreate,
+    EquipmentOut,
+    EquipmentPositionCreate,
+    EquipmentPositionOut,
+    EquipmentPositionUpdate,
+)
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.schemas.equipment import (
-    EquipmentPositionOut,
-    EquipmentPositionCreate,
-    EquipmentPositionUpdate,
-    EquipmentOut,
-    EquipmentCreate,
-)
-from app.api.providers import get_session, RoleChecker, get_current_user
-from app.crud.equipment import crud_equipment
-from app.core.http_exceptions import (
-    x_already_exists_exception_factory,
-    x_not_found_exception_factory,
-)
 
 router = APIRouter()
 admin_only = RoleChecker(["admin"])
 
-equipment_position_already_exists_exception = x_already_exists_exception_factory(
-    "Equipment position"
-)
-equipment_position_not_found_exception = x_not_found_exception_factory(
-    "Equipment position"
-)
-equipment_balance_not_found_exception = x_not_found_exception_factory(
-    "Equipment balance"
-)
-equipment_balance_already_exists_exception = x_already_exists_exception_factory(
-    "Equipment balance"
-)
+equipment_position_ae = x_already_exists_exception("Equipment position")
+equipment_position_nf = x_not_found_exception("Equipment position")
+equipment_balance_nf = x_not_found_exception("Equipment balance")
+equipment_balance_ae = x_already_exists_exception("Equipment balance")
 
 
 @router.get("/", response_model=List[EquipmentPositionOut])
@@ -61,7 +49,7 @@ async def get_equipment_position(
         session, name=name
     )
     if not equipment_position:
-        raise equipment_position_not_found_exception
+        raise equipment_position_nf
 
     return equipment_position
 
@@ -78,7 +66,7 @@ async def create_equipment_position(
         session, name=equipment_position_in.name
     )
     if equipment_position:
-        raise equipment_position_already_exists_exception
+        raise equipment_position_ae
 
     equipment_position = await crud_equipment.create_equipment_position(
         session, equipment_position_in=equipment_position_in
@@ -99,7 +87,7 @@ async def update_equipment_position(
         session, name=equipment_position_in.name
     )
     if not equipment_position:
-        raise equipment_position_not_found_exception
+        raise equipment_position_nf
 
     equipment_position = await crud_equipment.update_equipment_position(
         session,
@@ -110,7 +98,11 @@ async def update_equipment_position(
     return equipment_position
 
 
-@router.delete("/{name}", status_code=204, dependencies=[Depends(admin_only)])
+@router.delete(
+    "/{name}",
+    status_code=204,
+    dependencies=[Depends(admin_only)],
+)
 async def update_equipment_position(
     name: str,
     session: AsyncSession = Depends(get_session),
@@ -122,7 +114,7 @@ async def update_equipment_position(
         session, name=name
     )
     if not equipment_position:
-        raise equipment_position_not_found_exception
+        raise equipment_position_nf
 
     equipment_position = await crud_equipment.delete_equipment_position(
         session,
@@ -130,7 +122,10 @@ async def update_equipment_position(
     )
 
 
-@router.get("/balance/{name}", response_model=List[EquipmentOut])
+@router.get(
+    "/balance/{name}",
+    response_model=List[EquipmentOut],
+)
 async def get_balance_by_equipment_name(
     name: str,
     skip: int = 0,
@@ -144,7 +139,7 @@ async def get_balance_by_equipment_name(
         session, name=name
     )
     if not equipment_position:
-        raise equipment_position_not_found_exception
+        raise equipment_position_nf
 
     equipment = await crud_equipment.get_equipment_balance_by_position(
         session, skip=skip, limit=limit, equipment_position=equipment_position
@@ -153,8 +148,11 @@ async def get_balance_by_equipment_name(
     return equipment
 
 
-@router.post("/balance/{name}", response_model=EquipmentOut)
-async def get_balance_by_equipment_name(
+@router.post(
+    "/balance/{name}",
+    response_model=EquipmentOut,
+)
+async def create_balance_by_equipment_name(
     name: str,
     equipment_balance_in: EquipmentCreate,
     session: AsyncSession = Depends(get_session),
@@ -166,7 +164,7 @@ async def get_balance_by_equipment_name(
         session, name=name
     )
     if not equipment_position:
-        raise equipment_position_not_found_exception
+        raise equipment_position_nf
 
     equipment_balance = (
         await crud_equipment.get_equipment_balance_by_position_serial_number(
@@ -176,7 +174,7 @@ async def get_balance_by_equipment_name(
         )
     )
     if equipment_balance:
-        raise equipment_balance_already_exists_exception
+        raise equipment_balance_ae
 
     equipment_balance = await crud_equipment.create_equipment_balance(
         session,
@@ -187,8 +185,12 @@ async def get_balance_by_equipment_name(
     return equipment_balance
 
 
-@router.delete("/balance/{name}", status_code=204, dependencies=[Depends(admin_only)])
-async def get_balance_by_equipment_name(
+@router.delete(
+    "/balance/{name}",
+    status_code=204,
+    dependencies=[Depends(admin_only)],
+)
+async def delete_balance_by_equipment_name(
     name: str,
     serial_number: str,
     session: AsyncSession = Depends(get_session),
@@ -200,7 +202,7 @@ async def get_balance_by_equipment_name(
         session, name=name
     )
     if not equipment_position:
-        raise equipment_position_not_found_exception
+        raise equipment_position_nf
 
     equipment_balance = (
         await crud_equipment.get_equipment_balance_by_position_serial_number(
@@ -210,7 +212,7 @@ async def get_balance_by_equipment_name(
         )
     )
     if not equipment_balance:
-        raise equipment_balance_not_found_exception
+        raise equipment_balance_nf
 
     await crud_equipment.delete_equipment_balance(
         session, equipment_balance=equipment_balance

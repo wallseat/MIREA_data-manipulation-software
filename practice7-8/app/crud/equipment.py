@@ -1,15 +1,14 @@
 from typing import List
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
-from fastapi.encoders import jsonable_encoder
-
 from app.models import EquipmentBalance, EquipmentPosition
 from app.schemas.equipment import (
     EquipmentCreate,
     EquipmentPositionCreate,
     EquipmentPositionUpdate,
 )
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy import and_, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CRUDEquipment:
@@ -39,7 +38,10 @@ class CRUDEquipment:
         return result.scalars().first()
 
     async def create_equipment_position(
-        self, session: AsyncSession, *, equipment_position_in: EquipmentPositionCreate
+        self,
+        session: AsyncSession,
+        *,
+        equipment_position_in: EquipmentPositionCreate,
     ) -> EquipmentPosition:
 
         equipment_position = EquipmentPosition(**equipment_position_in.dict())
@@ -122,7 +124,7 @@ class CRUDEquipment:
         equipment_balance_in: EquipmentCreate,
     ) -> EquipmentPosition:
         equipment_position = EquipmentBalance(
-            **equipment_balance_in.dict(), position_id=equipment_position.ids
+            **equipment_balance_in.dict(), position_id=equipment_position.id
         )
         session.add(equipment_position)
 

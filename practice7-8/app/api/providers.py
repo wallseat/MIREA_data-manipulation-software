@@ -1,22 +1,21 @@
 from typing import AsyncGenerator, List
 
-from fastapi import Depends
-from jose import JWTError, jwt
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, join
-
 from app.core.const import ALGORITHM, SECRET_KEY
-from app.core.security import oauth2_scheme
 from app.core.http_exceptions import (
     credentials_exception,
-    x_not_found_exception_factory,
     permission_denied_exception,
+    x_not_found_exception,
 )
+from app.core.security import oauth2_scheme
 from app.crud.user import crud_user
 from app.db import engine
-from app.models import User, UserGroup, Group
+from app.models import Group, User, UserGroup
+from fastapi import Depends
+from jose import JWTError, jwt
+from sqlalchemy import join, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-user_not_found_exception = x_not_found_exception_factory("User")
+user_not_found_exception = x_not_found_exception("User")
 
 
 async def get_session() -> AsyncGenerator:
@@ -25,7 +24,8 @@ async def get_session() -> AsyncGenerator:
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_session)
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_session),
 ) -> User:
 
     try:
@@ -46,7 +46,12 @@ async def get_current_user(
 
 
 class RoleChecker:
-    def __init__(self, allowed_groups: List[str], *, raise_not_allowed: bool = True):
+    def __init__(
+        self,
+        allowed_groups: List[str],
+        *,
+        raise_not_allowed: bool = True,
+    ):
         self.allowed_groups = allowed_groups
         self.raise_not_allowed = raise_not_allowed
 

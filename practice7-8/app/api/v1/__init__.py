@@ -1,10 +1,7 @@
-from app.api.v1.endpoints import organization
+from app.api.providers import get_current_user
 from fastapi import APIRouter, Depends
 
-from app.api.providers import get_current_user
-
-from .endpoints import user, group, organization, contact_person, equipment
-
+from .endpoints import contact_person, equipment, group, organization, user, contract
 
 v1_router = APIRouter()
 
@@ -36,6 +33,12 @@ v1_router.include_router(
     equipment.router,
     prefix="/equipment",
     tags=["equipment"],
+    dependencies=[Depends(get_current_user)],
+)
+v1_router.include_router(
+    contract.router,
+    prefix="/contract",
+    tags=["contract"],
     dependencies=[Depends(get_current_user)],
 )
 

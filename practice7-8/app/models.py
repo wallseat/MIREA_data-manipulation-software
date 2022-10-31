@@ -217,7 +217,7 @@ class Task(Base):
     priority_id = Column(
         UUID(as_uuid=True),
         ForeignKey(
-            f"{SCHEMA}.priority.id",
+            f"{SCHEMA}.task_priority.id",
             deferrable=True,
             initially="DEFERRED",
         ),
@@ -236,7 +236,7 @@ class Task(Base):
     close_date = Column(Date, nullable=True)
     due_date = Column(Date, nullable=True)
     completed = Column(Boolean, default=False, nullable=False)
-    author = Column(
+    author_id = Column(
         UUID(as_uuid=True),
         ForeignKey(
             f"{SCHEMA}.user.id",
@@ -245,7 +245,7 @@ class Task(Base):
         ),
         nullable=False,
     )
-    executor = Column(
+    executor_id = Column(
         UUID(as_uuid=True),
         ForeignKey(
             f"{SCHEMA}.user.id",
@@ -281,8 +281,8 @@ class TaskType(Base):
     type = Column(String(25), nullable=False, unique=True)
 
 
-class Priority(Base):
-    __tablename__ = "priority"
+class TaskPriority(Base):
+    __tablename__ = "task_priority"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     priority = Column(String(25), nullable=False, unique=True)

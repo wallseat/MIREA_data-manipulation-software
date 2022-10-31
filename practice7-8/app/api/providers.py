@@ -81,3 +81,8 @@ class RoleChecker:
             raise permission_denied_exception
 
         return bool(intersected_groups)
+
+    def extend(self, groups: List[str]) -> "RoleChecker":
+        return RoleChecker(
+            [*self.allowed_groups, *groups], raise_not_allowed=self.raise_not_allowed
+        )

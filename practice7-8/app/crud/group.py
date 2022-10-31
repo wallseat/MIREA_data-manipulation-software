@@ -14,13 +14,16 @@ class CRUDGroup:
         return result.scalars().all()
 
     async def get_by_name(self, session: AsyncSession, *, name: str) -> Optional[Group]:
-        result = await session.execute(select(Group).where(Group.name == name))
+        stmt = select(Group).where(Group.name == name)
+
+        result = await session.execute(stmt)
+
         return result.scalars().first()
 
     async def add_users_to_group(
         self, session: AsyncSession, *, users_ids: List[UUID], group_id: UUID
     ):
-        await session.execute(
+        stmt = (
             insert(UserGroup)
             .values(
                 [{"user_id": user_id, "group_id": group_id} for user_id in users_ids]
@@ -28,17 +31,17 @@ class CRUDGroup:
             .on_conflict_do_nothing()
         )
 
+        await session.execute(stmt)
         await session.commit()
 
     async def remove_users_from_group(
         self, session: AsyncSession, *, users_ids: List[UUID], group_id: UUID
     ):
-        await session.execute(
-            delete(UserGroup).where(
-                and_(UserGroup.group_id == group_id, UserGroup.user_id.in_(users_ids))
-            )
+        stmt = delete(UserGroup).where(
+            and_(UserGroup.group_id == group_id, UserGroup.user_id.in_(users_ids))
         )
 
+        await session.execute(stmt)
         await session.commit()
 
 

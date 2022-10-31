@@ -18,7 +18,9 @@ class CRUDOrganization:
         skip: int = 0,
         limit: int = 100,
     ) -> List[Organization]:
-        result = await session.execute(select(Organization).offset(skip).limit(limit))
+        stmt = select(Organization).offset(skip).limit(limit)
+
+        result = await session.execute(stmt)
 
         return result.scalars().all()
 
@@ -28,9 +30,9 @@ class CRUDOrganization:
         *,
         name: str,
     ) -> Optional[Organization]:
-        result = await session.execute(
-            select(Organization).where(Organization.name == name)
-        )
+        stmt = select(Organization).where(Organization.name == name)
+
+        result = await session.execute(stmt)
 
         return result.scalars().first()
 

@@ -13,8 +13,9 @@ router = APIRouter()
 
 admin_only = RoleChecker(["admin"])
 
-group_already_exists_exception = x_already_exists_exception("Group")
-group_not_found_exception = x_not_found_exception("Group")
+user_nf = x_not_found_exception("User")
+group_ae = x_already_exists_exception("Group")
+group_nf = x_not_found_exception("Group")
 
 
 @router.get("/", response_model=List[GroupOut], dependencies=[Depends(admin_only)])
@@ -42,7 +43,7 @@ async def get_user_by_group(
     """
     db_obj = await crud_group.get_by_name(session, name=group_name)
     if not db_obj:
-        raise group_not_found_exception
+        raise group_nf
 
     users = await crud_user.get_by_group(session, group_name=group_name)
     return users
@@ -65,13 +66,13 @@ async def add_user_to_group(
     """
     group = await crud_group.get_by_name(session, name=group_name)
     if not group:
-        raise group_not_found_exception
+        raise group_nf
 
     users = []
     for username in group_add_users_in.usernames:
         db_obj = await crud_user.get_by_name(session, name=username)
         if not db_obj:
-            raise user_not_found_exception
+            raise user_nf
         users.append(db_obj)
 
     await crud_group.add_users_to_group(
@@ -97,13 +98,13 @@ async def remove_users_from_group(
     """
     group = await crud_group.get_by_name(session, name=group_name)
     if not group:
-        raise group_not_found_exception
+        raise group_nf
 
     users = []
     for username in group_add_users_in.usernames:
         db_obj = await crud_user.get_by_name(session, name=username)
         if not db_obj:
-            raise user_not_found_exception
+            raise user_nf
         users.append(db_obj)
 
     await crud_group.remove_users_from_group(

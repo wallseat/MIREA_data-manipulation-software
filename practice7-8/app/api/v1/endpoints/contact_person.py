@@ -21,7 +21,7 @@ contact_person_not_found_exception = x_not_found_exception("Contact person")
 
 
 @router.get("/{organization}", response_model=List[ContactPersonOut])
-async def get_contact_persons(
+async def get(
     organization: str,
     skip: int = 0,
     limit: int = 100,
@@ -34,7 +34,7 @@ async def get_contact_persons(
     if not organization:
         raise organization_not_found_exception
 
-    contact_persons = await crud_contact_person.get_contact_persons(
+    contact_persons = await crud_contact_person.get(
         session, organization=organization, skip=skip, limit=limit
     )
 

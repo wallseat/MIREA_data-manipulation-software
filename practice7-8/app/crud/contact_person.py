@@ -1,3 +1,4 @@
+from uuid import UUID
 from typing import List, Optional
 
 from app.models import ContactPerson, Organization
@@ -8,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CRUDContactPerson:
-    async def get_contact_persons(
+    async def get(
         self,
         session: AsyncSession,
         *,
@@ -24,6 +25,15 @@ class CRUDContactPerson:
         )
 
         return result.scalars().all()
+
+    async def get_by_id(
+        self, session: AsyncSession, *, id_: UUID
+    ) -> Optional[ContactPerson]:
+        result = await session.execute(
+            select(ContactPerson).where(ContactPerson.id == id_)
+        )
+
+        return result.scalars().first()
 
     async def get_by_first_second_name_email(
         self,

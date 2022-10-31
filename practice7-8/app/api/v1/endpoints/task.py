@@ -9,6 +9,7 @@ from app.core.http_exceptions import (
 )
 from app.crud.task import crud_task
 from app.crud.user import crud_user
+from app.crud.contact_person import crud_contact_person
 from app.models import User
 from app.schemas.task import (
     TaskCreate,
@@ -32,6 +33,7 @@ priority_nf = x_not_found_exception("Task priority")
 type_nf = x_not_found_exception("Task type")
 user_nf = x_not_found_exception("User")
 task_nf = x_not_found_exception("Task")
+contact_person_nf = x_not_found_exception("Contact person")
 
 task_type_ae = x_already_exists_exception("Task type")
 task_priority_ae = x_already_exists_exception("Task priority")
@@ -71,10 +73,15 @@ async def create_task(
     if not type_:
         raise type_nf
 
+    contact_person = await crud_contact_person.get_by_id(
+        session, id_=task_in.contact_person_id
+    )
+    if not contact_person:
+        raise contact_person_nf
+
     executor = await crud_user.get_by_name(session, name=task_in.executor_name)
     if not executor:
         raise user_nf
-    
 
     task = await crud_task.create(
         session,
@@ -221,7 +228,9 @@ async def create_task_priority(
     if task_priority:
         raise task_priority_ae
 
-    task_type = await crud_task.create_priority(session, task_priority_in=task_priority_in)
+    task_type = await crud_task.create_priority(
+        session, task_priority_in=task_priority_in
+    )
 
     return task_type
 

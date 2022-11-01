@@ -1,13 +1,6 @@
-from typing import Optional
 from datetime import date
 
-from pydantic import BaseModel, Field
-
-
-class ReportCreate(BaseModel):
-    user: str
-    date_start: date
-    date_end: Optional[date] = Field(default_factory=date.today)
+from pydantic import BaseModel
 
 
 class ReportOut(BaseModel):
